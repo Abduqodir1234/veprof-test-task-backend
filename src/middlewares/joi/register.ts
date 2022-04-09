@@ -1,10 +1,13 @@
 import { NextFunction, Response } from "express";
-import Joi from "joi";
+import Joi, { options } from "joi";
 import { Request2 } from "../verifyToken";
 
 const UserRegisterSchema = Joi.object({
     email:Joi.string().email().required(),
-    password:Joi.string().min(6).alphanum().required(),
+    password:Joi.string()
+        .min(6)
+        .pattern(new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}$/))
+        .required(),
     confirm_password:Joi.ref("password")
 })
 
