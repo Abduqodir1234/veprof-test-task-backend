@@ -4,7 +4,7 @@ import { Request2 } from "../verifyToken";
 
 const UserRegisterSchema = Joi.object({
     email:Joi.string().email().required(),
-    password:Joi.string().required(),
+    password:Joi.string().min(6).alphanum().required(),
     confirm_password:Joi.ref("password")
 })
 
