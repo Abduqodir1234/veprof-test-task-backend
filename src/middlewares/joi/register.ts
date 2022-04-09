@@ -6,7 +6,7 @@ const UserRegisterSchema = Joi.object({
     email:Joi.string().email().required(),
     password:Joi.string()
         .min(6)
-        .pattern(new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}$/))
+        .pattern(new RegExp(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&+])[A-Za-z\d@+$!%*#?&+]{6,}$/))
         .required(),
     confirm_password:Joi.ref("password")
 })
