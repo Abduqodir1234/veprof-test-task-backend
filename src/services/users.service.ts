@@ -2,6 +2,7 @@ import Users from "../models/user";
 import hashing from "../middlewares/hashing";
 import admin from "../middlewares/firebase";
 import compareHash from "../middlewares/compareHash";
+import { ExecFileException } from "child_process";
 
 
 interface User{
@@ -39,12 +40,14 @@ class UserService{
 
     async logIn(email:string,password:string){
         try{
-            const pr1 = new Promise<{uid:string}>((resolve)=>resolve(admin.auth().getUserByEmail(email)))
-            const pr2 = new Promise<null | {email:string,password:string}>((resolve)=>resolve(Users.findOne({email})))
-            const final = await Promise.all([pr1,pr2])
-            const isCorrect = await compareHash(final[1]?.password || "",password)
+            const user = await Users.findOne({email})
+            if(!user){
+                return{msg:{error:true,msg:"User does not exist"},status:500}
+            }
+            const firebase = await admin.auth().getUserByEmail(email)
+            const isCorrect = await compareHash(user?.password || "",password)
             if(isCorrect){
-                const token = await admin.auth().createCustomToken(final[0].uid)
+                const token = await admin.auth().createCustomToken(firebase.uid)
                 return {msg:{error:false,token},status:200}
             }
             else{
@@ -52,7 +55,7 @@ class UserService{
             }
         }
         catch(e){
-            return{msg:{error:true,msg:e},status:404}
+            return{msg:{error:true,msg:e},status:500}
         }
     }  
 }
